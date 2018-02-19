@@ -15,8 +15,8 @@ class AddPlansTable extends Migration
     {
         Schema::create('plans', function (Blueprint $table){
             $table->string('provider_id')->primary();
-            $table->json('name');
-            $table->json('description');
+            $table->string('name');
+            $table->string('description');
             $table->float('price', 10, 2);
             $table->json('features')->nullable();
             $table->enum('period', ['monthly', 'yearly'])->default('monthly');
