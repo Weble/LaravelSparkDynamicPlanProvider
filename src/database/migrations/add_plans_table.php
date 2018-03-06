@@ -21,7 +21,6 @@ class AddPlansTable extends Migration
             $table->json('features')->nullable();
             $table->enum('period', ['monthly', 'yearly'])->default('monthly');
             $table->boolean('archived')->default(false)->index();
-            $table->boolean('default')->default(0);
             $table->integer('trial')->default(0);
 
             $table->timestamps();

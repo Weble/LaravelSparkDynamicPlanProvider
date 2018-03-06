@@ -4,6 +4,7 @@ namespace Webleit\LaravelSparkDynamicPlanProvider;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Webleit\LaravelSparkDynamicPlanProvider\Contracts\PlanContract;
 use Webleit\LaravelSparkDynamicPlanProvider\Contracts\PlanObserverContract;
@@ -40,12 +41,19 @@ class DynamicPlanServiceProvider extends ServiceProvider
      */
     public function loadPlans ()
     {
-        if (config('dynamicplans.cache', null) === null) {
-            return app(PlanContract::class)->all();
+        /** @var Model $instance */
+        $instance = app(PlanContract::class);
+
+        if (!Schema::hasTable($instance->getTable())) {
+            return collect([]);
         }
 
-        return Cache::store(config('dynamicplans.cache'))->remember('dynamicplans.plans', function () {
-            return app(PlanContract::class)->all();
+        if (config('dynamicplans.cache', null) === null) {
+            return $instance->get();
+        }
+
+        return Cache::store(config('dynamicplans.cache'))->remember('dynamicplans.plans', function () use ($instance) {
+            return $instance->get();
         });
     }
 
@@ -69,7 +77,7 @@ class DynamicPlanServiceProvider extends ServiceProvider
     protected function observePlans ()
     {
         $className = get_class(app(PlanContract::class));
-        call_user_func([$className, 'observe'], PlanObserver::class);
+        call_user_func([$className, 'observe'], PlanObserverContract::class);
     }
 
     public function register ()
@@ -77,13 +85,13 @@ class DynamicPlanServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/config/dynamicplans.php', 'dynamicplans');
     }
 
-    protected function publishMigrations ()
+    protected function publishMigrations()
     {
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
-
-        $this->publishes([
-            __DIR__ . '/database/migrations' => database_path('migrations')
-        ], 'migrations');
+        if (! class_exists('AddPlansTable')) {
+            $this->publishes([
+                __DIR__.'/../database/migrations/add_plans_table.php' => database_path('migrations/'.date('Y_m_d_His', time()).'_add_plans_table.php'),
+            ], 'migrations');
+        }
     }
 
     protected function publishConfig (): void
