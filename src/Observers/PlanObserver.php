@@ -1,20 +1,21 @@
 <?php
 
-namespace Webleit\LaravelSparkDynamicPlanProvider;
+namespace Webleit\LaravelSparkDynamicPlanProvider\Observers;
 
-use App\Plan;
 use Laravel\Cashier\Cashier;
+use Webleit\LaravelSparkDynamicPlanProvider\Contracts\PlanContract;
+use Webleit\LaravelSparkDynamicPlanProvider\Contracts\PlanObserverContract;
 
 /**
  * Class PlanObserver
  * @package App\Observers
  */
-class PlanObserver
+class PlanObserver implements PlanObserverContract
 {
     /**
-     * @param Plan $plan
+     * @param PlanContract $plan
      */
-    public function created (Plan $plan)
+    public function created (PlanContract $plan)
     {
         \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
         \Stripe\Plan::create([
@@ -27,9 +28,9 @@ class PlanObserver
     }
 
     /**
-     * @param Plan $plan
+     * @param PlanContract $plan
      */
-    public function updated (Plan $plan)
+    public function updated (PlanContract $plan)
     {
         \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
         \Stripe\Plan::update($plan->provider_id, [
@@ -41,9 +42,9 @@ class PlanObserver
     }
 
     /**
-     * @param Plan $plan
+     * @param PlanContract $plan
      */
-    public function deleting (Plan $plan)
+    public function deleting (PlanContract $plan)
     {
         // Dont' delete it, keep it for archiving
     }

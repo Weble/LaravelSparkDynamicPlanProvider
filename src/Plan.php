@@ -6,12 +6,13 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Spark\Billable;
+use Webleit\LaravelSparkDynamicPlanProvider\Contracts\PlanContract;
 
 /**
  * Class Plan
  * @package App
  */
-class Plan extends Model
+class Plan extends Model implements PlanContract
 {
     use SoftDeletes;
 
