@@ -2,9 +2,13 @@
 
 namespace Webleit\LaravelSparkDynamicPlanProvider;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
-use Webleit\LaravelSparkDynamicPlanProvider\PlanObserver;
+use Webleit\LaravelSparkDynamicPlanProvider\Contracts\PlanContract;
+use Webleit\LaravelSparkDynamicPlanProvider\Contracts\PlanObserverContract;
+use Webleit\LaravelSparkDynamicPlanProvider\Observers\PlanObserver;
+use Laravel\Spark\Spark;
 
 /**
  * Class DynamicPlanServiceProvider
@@ -12,12 +16,17 @@ use Webleit\LaravelSparkDynamicPlanProvider\PlanObserver;
  */
 class DynamicPlanServiceProvider extends ServiceProvider
 {
-    public function boot()
+    public $bindings = [
+        PlanContract::class => Plan::class,
+        PlanObserverContract::class => PlanObserver::class
+    ];
+
+    public function boot ()
     {
         $this->publishMigrations();
         $this->publishConfig();
 
-        Plan::observe(PlanObserver::class);
+        $this->observePlans();
 
         if (config('dynamicplans.autoload', true)) {
             $this->registerSparkPlans(
@@ -29,24 +38,24 @@ class DynamicPlanServiceProvider extends ServiceProvider
     /**
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function loadPlans()
+    public function loadPlans ()
     {
         if (config('dynamicplans.cache', null) === null) {
-            return Plan::all();
+            return app(PlanContract::class)->all();
         }
 
-        return Cache::store(config('dynamicplans.cache'))->remember('dynamicplans.plans', function (){
-            return Plan::all();
+        return Cache::store(config('dynamicplans.cache'))->remember('dynamicplans.plans', function () {
+            return app(PlanContract::class)->all();
         });
     }
 
     /**
      * @param $plans
      */
-    public function registerSparkPlans($plans)
+    public function registerSparkPlans ($plans)
     {
         // Create a Plan for each plan in the db
-        $plans->each(function($plan){
+        $plans->each(function ($plan) {
             $sparkPlan = Spark::plan($plan->name, $plan->provider_id)
                 ->price($plan->price)
                 ->features($plan->features ?: []);
@@ -57,17 +66,23 @@ class DynamicPlanServiceProvider extends ServiceProvider
         });
     }
 
-    public function register ()
+    protected function observePlans ()
     {
-        $this->mergeConfigFrom(__DIR__.'/config/dynamicplans.php', 'dynamicplans');
+        $className = get_class(app(PlanContract::class));
+        call_user_func([$className, 'observe'], PlanObserver::class);
     }
 
-    protected function publishMigrations()
+    public function register ()
     {
-        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+        $this->mergeConfigFrom(__DIR__ . '/config/dynamicplans.php', 'dynamicplans');
+    }
+
+    protected function publishMigrations ()
+    {
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
 
         $this->publishes([
-            __DIR__.'/database/migrations' => database_path('migrations')
+            __DIR__ . '/database/migrations' => database_path('migrations')
         ], 'migrations');
     }
 
