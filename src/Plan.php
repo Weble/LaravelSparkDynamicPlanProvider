@@ -1,6 +1,6 @@
 <?php
 
-namespace Webleit\LaravelSparkDynanicPlanProvider;
+namespace Webleit\LaravelSparkDynamicPlanProvider;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;

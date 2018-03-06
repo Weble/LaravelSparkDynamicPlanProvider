@@ -2,13 +2,12 @@
 
 namespace Webleit\LaravelSparkDynamicPlanProvider;
 
-use App\Observers\PlanObserver;
-use App\Plan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
+use Webleit\LaravelSparkDynamicPlanProvider\PlanObserver;
 
 /**
- * Class ZohoBooksServiceProvider
+ * Class DynamicPlanServiceProvider
  * @package App\Providers
  */
 class DynamicPlanServiceProvider extends ServiceProvider
