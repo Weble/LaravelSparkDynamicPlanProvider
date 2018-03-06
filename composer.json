@@ -1,7 +1,7 @@
 {
     "name": "webleit/laravel-spark-dynamic-plan-provider",
-    "version": "1.0.0",
-    "homepage": "https://github.com/webleit/LaravelSparkDynanicPlanProvider",
+    "version": "1.1.0",
+    "homepage": "https://github.com/webleit/LaravelSparkDynamicPlanProvider",
     "license": "MIT",
     "authors": [
         {
@@ -24,12 +24,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Webleit\\LaravelSparkDynamicPlanProvider\\": "src"
+            "Webleit\\LaravelSparkDynamicPlanProvider\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Webleit\\LaravelSparkDynamicPlanProvider\\": "tests"
+            "Webleit\\LaravelSparkDynamicPlanProvider\\": "tests/"
         }
     },
     "scripts": {

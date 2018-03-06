@@ -1,4 +1,4 @@
-# LaravelSparkDynanicPlanProvider
+# LaravelSparkDynamicPlanProvider
 
 Laravel Spark Service Provider that allows to create Plans with Eloquent and have them created on Stripe, automatically loading them into Spark.
 
