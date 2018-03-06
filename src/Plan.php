@@ -17,18 +17,6 @@ class Plan extends Model implements PlanContract
     use SoftDeletes;
 
     /**
-     * Periods
-     */
-    const PERIOD_MONTHLY = 'monthly';
-    const PERIOD_YEARLY = 'yearly';
-
-    /**
-     * Stripe Periods
-     */
-    const STRIPE_PERIOD_MONTHLY = 'month';
-    const STRIPE_PERIOD_YEARLY = 'year';
-
-    /**
      * @var string
      */
     protected $primaryKey = 'provider_id';

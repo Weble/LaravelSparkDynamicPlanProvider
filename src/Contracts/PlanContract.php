@@ -12,6 +12,18 @@ use Laravel\Spark\Billable;
 interface PlanContract
 {
     /**
+     * Periods
+     */
+    const PERIOD_MONTHLY = 'monthly';
+    const PERIOD_YEARLY = 'yearly';
+
+    /**
+     * Stripe Periods
+     */
+    const STRIPE_PERIOD_MONTHLY = 'month';
+    const STRIPE_PERIOD_YEARLY = 'year';
+    
+    /**
      * @param Carbon $from
      * @return \DateTimeZone|int|string
      */

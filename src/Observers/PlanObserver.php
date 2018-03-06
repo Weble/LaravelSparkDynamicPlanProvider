@@ -3,6 +3,7 @@
 namespace Webleit\LaravelSparkDynamicPlanProvider\Observers;
 
 use Laravel\Cashier\Cashier;
+use Stripe\Error\InvalidRequest;
 use Webleit\LaravelSparkDynamicPlanProvider\Contracts\PlanContract;
 use Webleit\LaravelSparkDynamicPlanProvider\Contracts\PlanObserverContract;
 
@@ -18,13 +19,18 @@ class PlanObserver implements PlanObserverContract
     public function created (PlanContract $plan)
     {
         \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-        \Stripe\Plan::create([
-            'id' => $plan->provider_id,
-            'amount' => $plan->price * 100,
-            'interval' => ($plan->period == Plan::PERIOD_MONTHLY ? Plan::STRIPE_PERIOD_MONTHLY : Plan::STRIPE_PERIOD_YEARLY),
-            'name' => $plan->name,
-            'currency' => Cashier::usesCurrency()
-        ]);
+
+        try {
+            \Stripe\Plan::create([
+                'id' => $plan->provider_id,
+                'amount' => $plan->price * 100,
+                'interval' => ($plan->period == PlanContract::PERIOD_MONTHLY ? PlanContract::STRIPE_PERIOD_MONTHLY : PlanContract::STRIPE_PERIOD_YEARLY),
+                'name' => $plan->name,
+                'currency' => Cashier::usesCurrency()
+            ]);
+        } catch( InvalidRequest $e) {
+            // let's suppose it already exists
+        }
     }
 
     /**
@@ -35,7 +41,7 @@ class PlanObserver implements PlanObserverContract
         \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
         \Stripe\Plan::update($plan->provider_id, [
             'amount' => $plan->price * 100,
-            'interval' => ($plan->period == Plan::PERIOD_MONTHLY ? Plan::STRIPE_PERIOD_MONTHLY : Plan::STRIPE_PERIOD_YEARLY),
+            'interval' => ($plan->period == PlanContract::PERIOD_MONTHLY ? PlanContract::STRIPE_PERIOD_MONTHLY : PlanContract::STRIPE_PERIOD_YEARLY),
             'name' => $plan->name,
             'currency' => Cashier::usesCurrency()
         ]);
